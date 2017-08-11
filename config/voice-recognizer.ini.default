@@ -2,7 +2,7 @@
 # Should be installed to ~/.config/voice-recognizer.ini
 
 # Select the trigger: gpio (default), clap, ok-google.
-# trigger = clap
+trigger = ok-google
 
 # Select the trigger sound:
 # trigger-sound = path_to_your_sound.wav
