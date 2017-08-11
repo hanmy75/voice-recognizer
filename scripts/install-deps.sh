@@ -17,6 +17,9 @@ set -o errexit
 
 scripts_dir="$(dirname "${BASH_SOURCE[0]}")"
 
+# Create config folder
+mkdir /home/pi/.config /home/pi/Desktop
+
 # make sure we're running as the owner of the checkout directory
 RUN_AS="$(ls -ld "$scripts_dir" | awk 'NR==1 {print $3}')"
 if [ "$USER" != "$RUN_AS" ]
