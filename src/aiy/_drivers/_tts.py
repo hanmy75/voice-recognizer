@@ -44,21 +44,11 @@ def say(player, words, lang='en-US'):
       lang: language for the text-to-speech engine.
     """
 
-    try:
-        (fd, tts_wav) = tempfile.mkstemp(suffix='.wav', dir=TMP_DIR)
-    except IOError:
-        logger.exception('Using fallback directory for TTS output')
-        (fd, tts_wav) = tempfile.mkstemp(suffix='.wav')
+    # Google Translate URL
+    TRANSLATE_COMMAND = 'mpg123 -q "http://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=%s&tl=en"'
 
-    os.close(fd)
-
-    words = '<volume level="60"><pitch level="130">%s</pitch></volume>' % words
-
-    try:
-        subprocess.call(['pico2wave', '--lang', lang, '-w', tts_wav, words])
-        player.play_wav(tts_wav)
-    finally:
-        os.unlink(tts_wav)
+    subprocess.call(TRANSLATE_COMMAND %words, shell=True)
+    #logger.warning(TRANSLATE_COMMAND %words)
 
 
 def _main():

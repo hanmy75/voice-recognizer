@@ -23,6 +23,8 @@ from rgbxy import Converter
 
 import actionbase
 
+import action_MY
+
 # =============================================================================
 #
 # Hey, Makers!
@@ -153,27 +155,27 @@ class SpeakShellCommandOutput(object):
 # the new volume. The example says the new volume aloud after changing the
 # volume.
 
-class VolumeControl(object):
-
-    """Changes the volume and says the new level."""
-
-    GET_VOLUME = r'amixer get Master | grep "Front Left:" | sed "s/.*\[\([0-9]\+\)%\].*/\1/"'
-    SET_VOLUME = 'amixer -q set Master %d%%'
-
-    def __init__(self, say, change):
-        self.say = say
-        self.change = change
-
-    def run(self, voice_command):
-        res = subprocess.check_output(VolumeControl.GET_VOLUME, shell=True).strip()
-        try:
-            logging.info("volume: %s", res)
-            vol = int(res) + self.change
-            vol = max(0, min(100, vol))
-            subprocess.call(VolumeControl.SET_VOLUME % vol, shell=True)
-            self.say(_('Volume at %d %%.') % vol)
-        except (ValueError, subprocess.CalledProcessError):
-            logging.exception("Error using amixer to adjust volume.")
+#class VolumeControl(object):
+#
+#    """Changes the volume and says the new level."""
+#
+#    GET_VOLUME = r'amixer get Master | grep "Front Left:" | sed "s/.*\[\([0-9]\+\)%\].*/\1/"'
+#    SET_VOLUME = 'amixer -q set Master %d%%'
+#
+#    def __init__(self, say, change):
+#        self.say = say
+#        self.change = change
+#
+#    def run(self, voice_command):
+#        res = subprocess.check_output(VolumeControl.GET_VOLUME, shell=True).strip()
+#        try:
+#            logging.info("volume: %s", res)
+#            vol = int(res) + self.change
+#            vol = max(0, min(100, vol))
+#            subprocess.call(VolumeControl.SET_VOLUME % vol, shell=True)
+#            self.say(_('Volume at %d %%.') % vol)
+#        except (ValueError, subprocess.CalledProcessError):
+#            logging.exception("Error using amixer to adjust volume.")
 
 
 # Example: Repeat after me
@@ -273,9 +275,9 @@ def make_actor(say):
             say, "ip -4 route get 1 | head -1 | cut -d' ' -f8",
             _('I do not have an ip address assigned to me.')))
 
-    actor.add_keyword(_('volume up'), VolumeControl(say, 10))
-    actor.add_keyword(_('volume down'), VolumeControl(say, -10))
-    actor.add_keyword(_('max volume'), VolumeControl(say, 100))
+#    actor.add_keyword(_('volume up'), VolumeControl(say, 10))
+#    actor.add_keyword(_('volume down'), VolumeControl(say, -10))
+#    actor.add_keyword(_('max volume'), VolumeControl(say, 100))
 
     actor.add_keyword(_('repeat after me'),
                       RepeatAfterMe(say, _('repeat after me')))
@@ -286,6 +288,9 @@ def make_actor(say):
 
     actor.add_keyword(_('raspberry power off'), PowerCommand(say, 'shutdown'))
     actor.add_keyword(_('raspberry reboot'), PowerCommand(say, 'reboot'))
+
+    # Make MY action
+    action_MY.make_actor(say, actor)
 
     return actor
 

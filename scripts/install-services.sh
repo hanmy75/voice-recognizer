@@ -39,3 +39,6 @@ systemctl enable status-led.service
 systemctl enable status-led-on.service
 systemctl enable status-led-off.service
 systemctl enable status-monitor.service
+
+# Copy Google Home OAuth 2.0 client json
+sudo cp scripts/assistant.json /home/pi
