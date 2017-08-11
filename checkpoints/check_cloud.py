@@ -49,7 +49,7 @@ def check_credentials_valid():
 
 
 def check_speech_reco():
-    """Try to test the speech reco code from voice-recognizer-raspi."""
+    """Try to test the speech reco code from voice-recognizer."""
     print('Testing the Google Cloud Speech API...')
     p = subprocess.Popen(  # pylint: disable=invalid-name
         [PYTHON3, SPEECH_PY, TEST_AUDIO], env=SPEECH_PY_ENV,

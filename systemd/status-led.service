@@ -5,8 +5,8 @@ After=local-fs.target sysinit.target
 
 [Service]
 ExecStartPre=/bin/bash -c 'test -p /tmp/status-led || /bin/mknod /tmp/status-led p'
-ExecStart=/bin/bash -c '/home/pi/voice-recognizer-raspi/env/bin/python3 -u src/led.py </tmp/status-led'
-WorkingDirectory=/home/pi/voice-recognizer-raspi
+ExecStart=/bin/bash -c '/home/pi/voice-recognizer/env/bin/python3 -u src/led.py </tmp/status-led'
+WorkingDirectory=/home/pi/voice-recognizer
 StandardOutput=inherit
 StandardError=inherit
 Restart=always

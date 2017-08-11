@@ -97,7 +97,7 @@ def start_service():
 
 
 def check_speech_reco():
-    """Try to test the speech reco code from voice-recognizer-raspi."""
+    """Try to test the speech reco code from voice-recognizer."""
     p = subprocess.Popen(  # pylint: disable=invalid-name
         [PYTHON3, SPEECH_PY, TEST_AUDIO], env=SPEECH_PY_ENV,
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
