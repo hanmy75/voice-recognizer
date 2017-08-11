@@ -69,6 +69,22 @@ TV_OPERATIONS = {
     "volume down": TV_VolumeDownOperation,
 }
 
+# [0] : voice command
+# [1] : Wemo Device
+# [2] : On/Off flag for TV control
+OPERATION_LIST = [
+    ["TV", "TV", 0],
+    ["speaker", "Speaker", 0],
+    ["table", "Table", 0],
+    ["center", "Center", 0],
+    ["window", "Window", 0],
+    ["play", "Trick", 1],
+    ["pause", "Trick", 0],
+    ["stop", "Stop", 0],
+    ["volume up", "Volume", 1],
+    ["volume down", "Volume", 0],
+]
+
 
 # Example: Change the volume
 # ==========================
@@ -99,33 +115,26 @@ class VolumeControl(object):
             logging.exception("Error using amixer to adjust volume.")
 
 
-class PowerOnControl(object):
+class PowerControl(object):
     """Control Power for device."""
-    def __init__(self, say, keyword):
+    def __init__(self, say, keyword, flag):
         self.say = say
         self.keyword = keyword
+        self.flag = flag
 
     def run(self, voice_command):
         command = voice_command.replace(self.keyword, "").strip()
-        #logging.info("Power On : %s", command)
-        if command in POWER_OPERATIONS:
-            POWER_OPERATIONS[command](1)
-            self.say(_("Ok"))
-        else:
-            self.say(_("I couldn't find " + command))
+        logging.info("Power %s on/off %d", command, self.flag)
+        result = False
+        for operation in OPERATION_LIST:
+            if operation[0] == command:
+                if self.flag == 1:
+                    wemo_backend.wemo_dict[operation[1]].on()
+                else:
+                    wemo_backend.wemo_dict[operation[1]].off()
+                result = True
 
-
-class PowerOffControl(object):
-    """Control Power for device."""
-    def __init__(self, say, keyword):
-        self.say = say
-        self.keyword = keyword
-
-    def run(self, voice_command):
-        command = voice_command.replace(self.keyword, "").strip()
-        #logging.info("Power Off : %s", command)
-        if command in POWER_OPERATIONS:
-            POWER_OPERATIONS[command](0)
+        if result == True:
             self.say(_("Ok"))
         else:
             self.say(_("I couldn't find " + command))
@@ -139,12 +148,20 @@ class TVControl(object):
 
     def run(self, voice_command):
         command = voice_command.replace(self.keyword, "").strip()
-        #logging.info("TV Command: %s", command)
-        if command in TV_OPERATIONS:
-            TV_OPERATIONS[command]()
+        logging.info("TV command : %s", command)
+        result = False
+        for operation in OPERATION_LIST:
+            if operation[0] == command:
+                if operation[2] == 1:
+                    wemo_backend.wemo_dict[operation[1]].on()
+                else:
+                    wemo_backend.wemo_dict[operation[1]].off()
+                result = True
+
+        if result == True:
             self.say(_("Ok"))
         else:
-            self.say(_(command + "is not valid"))
+            self.say(_("I couldn't find " + command))
 
 
 def make_actor(say, actor):
@@ -154,8 +171,8 @@ def make_actor(say, actor):
 #    actor.add_keyword(_('volume down'), VolumeControl(say, -10))
 #    actor.add_keyword(_('max volume'), VolumeControl(say, 100))
 
-    actor.add_keyword(_('turn on'), PowerOnControl(say, 'turn on the'))
-    actor.add_keyword(_('turn off'), PowerOffControl(say, 'turn off the'))
-    actor.add_keyword(_('turn up'), PowerOffControl(say, 'turn up the'))
+    actor.add_keyword(_('turn on'), PowerControl(say, 'turn on the', 1))
+    actor.add_keyword(_('turn off'), PowerControl(say, 'turn off the', 0))
+    actor.add_keyword(_('turn up'), PowerControl(say, 'turn up the', 0))
 
     actor.add_keyword(_('on TV'), TVControl(say, "on TV"))

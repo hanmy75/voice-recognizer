@@ -14,7 +14,7 @@ $ sudo apt-get update
 
 voice regpgnizer:
 ```
-$ sudo apt-get install git scons swig
+$ sudo apt-get install git scons swig mpg123
 $ cd ~
 $ git clone https://github.com/hanmy75/voice-recognizer.git
 $ cd ~/voice-recognizer
@@ -24,7 +24,7 @@ $ sudo scripts/install-alsa-config.sh
 $ make deploy
 ```
 
-neopixel & etc
+neopixel & etc:
 ```
 $ cd ~/voice-recognizer
 $ source env/bin/activate

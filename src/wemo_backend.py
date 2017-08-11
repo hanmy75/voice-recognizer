@@ -14,8 +14,10 @@ wemos = [
 ("192.168.0.2:52002", "Table"),
 ("192.168.0.2:52003", "Center"),
 ("192.168.0.2:52004", "Window"),
+("192.168.0.2:52005", "Trick"),
+("192.168.0.2:52006", "Volume"),
+("192.168.0.2:52007", "Stop"),
 ]
-
 
 class TimeoutException(Exception): pass
 
@@ -29,7 +31,6 @@ def time_limit(seconds):
         yield
     finally:
         signal.alarm(0)
-
 
 
 ##################
