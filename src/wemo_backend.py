@@ -8,15 +8,17 @@ import xml.etree.ElementTree as ET
 from contextlib import contextmanager
 
 
+WEMO_SERVCE_IP = "192.168.0.2:"
+
 wemos = [
-("192.168.0.2:52000", "TV"),
-("192.168.0.2:52001", "Speaker"),
-("192.168.0.2:52002", "Table"),
-("192.168.0.2:52003", "Center"),
-("192.168.0.2:52004", "Window"),
-("192.168.0.2:52005", "Trick"),
-("192.168.0.2:52006", "Volume"),
-("192.168.0.2:52007", "Stop"),
+(WEMO_SERVCE_IP + "52000", "TV"),
+(WEMO_SERVCE_IP + "52001", "Speaker"),
+(WEMO_SERVCE_IP + "52002", "Table"),
+(WEMO_SERVCE_IP + "52003", "Center"),
+(WEMO_SERVCE_IP + "52004", "Window"),
+(WEMO_SERVCE_IP + "52005", "Trick"),
+(WEMO_SERVCE_IP + "52006", "Volume"),
+(WEMO_SERVCE_IP + "52007", "Stop"),
 ]
 
 class TimeoutException(Exception): pass
