@@ -5,7 +5,7 @@
 trigger = ok-google
 
 # Select the trigger sound:
-# trigger-sound = path_to_your_sound.wav
+trigger-sound = /home/pi/voice-recognizer/resource/yes.wav
 
 # Uncomment to enable the Cloud Speech API for local commands.
 # cloud-speech = true

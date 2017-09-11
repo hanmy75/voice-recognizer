@@ -20,6 +20,10 @@ import subprocess
 import wemo_backend
 
 import actionbase
+import aiy.audio
+
+# Wave file for OK voice
+OK_VOICE_FILE = "/home/pi/voice-recognizer/resource/okay.wav"
 
 # Power Control Operation
 def TV_Operation(state):
@@ -135,7 +139,7 @@ class PowerControl(object):
                 result = True
 
         if result == True:
-            self.say(_("Ok"))
+            aiy.audio.play_wave(OK_VOICE_FILE)
         else:
             self.say(_("I couldn't find " + command))
 
@@ -159,7 +163,7 @@ class TVControl(object):
                 result = True
 
         if result == True:
-            self.say(_("Ok"))
+            aiy.audio.play_wave(OK_VOICE_FILE)
         else:
             self.say(_("I couldn't find " + command))
 
