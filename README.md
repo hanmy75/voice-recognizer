@@ -34,7 +34,7 @@ $ source env/bin/activate
 (env) $ scons
 (env) $ cd python
 (env) $ python -m pip install -e .
-(env) $ pip install peewee
+(env) $ pip install peewee pychromecast
 ```
 
 I2S hifiberry_dac Setup:
