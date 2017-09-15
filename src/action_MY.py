@@ -18,6 +18,7 @@ import datetime
 import logging
 import subprocess
 import wemo_backend
+import pychromecast
 
 import actionbase
 import aiy.audio
@@ -25,53 +26,67 @@ import aiy.audio
 # Wave file for OK voice
 OK_VOICE_FILE = "/home/pi/voice-recognizer/resource/okay.wav"
 
-# Power Control Operation
-def TV_Operation(state):
-    logging.info("TV Power state %d", state)
+# Chromecast Audio Frendly name
+CASTAUDIO_NAME = "MY Cast"
 
-def Speaker_Operation(state):
-    logging.info("Speaker state %d", state)
+# Chromecast Audio
+def CastPlay_Operation(cast, say):
+    logging.info("Cast Play")
+    if cast != []:
+        mc = cast.media_controller
+        mc.block_until_active(timeout=1)
+        mc.play()
 
-def TableLamp_Operation(state):
-    logging.info("Table Lamp state %d", state)
+def CastPause_Operation(cast, say):
+    logging.info("Cast Pause")
+    if cast != []:
+        mc = cast.media_controller
+        mc.block_until_active(timeout=1)
+        mc.pause()
 
-def LivingRoom_Operation(state):
-    logging.info("LivingRoom Lamp state %d", state)
+def CastSkip_Operation(cast, say):
+    logging.info("Cast Skip")
+    if cast != []:
+        mc = cast.media_controller
+        mc.block_until_active(timeout=1)
+        mc.skip()
 
-def WindowLamp_Operation(state):
-    logging.info("Window Lamp state %d", state)
+def CastStop_Operation(cast, say):
+    logging.info("Cast Stop")
+    if cast != []:
+        mc = cast.media_controller
+        mc.block_until_active(timeout=1)
+        mc.stop()
 
-POWER_OPERATIONS = {
-    "TV": TV_Operation,
-    "speaker": Speaker_Operation,
-    "table": TableLamp_Operation,
-    "center": LivingRoom_Operation,
-    "window": WindowLamp_Operation,
-}
+def CastVolumeUp_Operation(cast, say):
+    logging.info("Cast Volume Up")
+    if cast != []:
+        cast.volume_up()
 
-# TV Control Operation
-def TV_PlayOperation():
-    logging.info("TV Cmd : Play")
+def CastVolumeDown_Operation(cast, say):
+    logging.info("Cast Volume Down")
+    if cast != []:
+        cast.volume_down()
 
-def TV_PauseOperation():
-    logging.info("TV Cmd : Pause")
+def CastTellTitle_Operation(cast, say):
+    logging.info("Cast Tell Title")
+    if cast != []:
+        mc = cast.media_controller
+        say("This sone is " + mc.status.title + " by " + mc.status.artist)
 
-def TV_STOPOperation():
-    logging.info("TV Cmd : Stop")
 
-def TV_VolumeUpOperation():
-    logging.info("TV Cmd : Volume Up")
-
-def TV_VolumeDownOperation():
-    logging.info("TV Cmd : Volume Down")
-
-TV_OPERATIONS = {
-    "play": TV_PlayOperation,
-    "pause": TV_PauseOperation,
-    "stop": TV_STOPOperation,
-    "volume up": TV_VolumeUpOperation,
-    "volume down": TV_VolumeDownOperation,
-}
+# [0] : voice command
+# [1] : Operation
+CASTAUDIO_OPERATION_LIST = [
+    ["play", CastPlay_Operation],
+    ["pause", CastPause_Operation],
+    ["next", CastSkip_Operation],
+    ["skip", CastSkip_Operation],
+    ["stop", CastStop_Operation],
+    ["volume up", CastVolumeUp_Operation],
+    ["volume down", CastVolumeDown_Operation],
+    ["what is", CastTellTitle_Operation],
+]
 
 # [0] : voice command
 # [1] : Wemo Device
@@ -168,6 +183,28 @@ class TVControl(object):
             self.say(_("I couldn't find " + command))
 
 
+class CastAudioControl(object):
+    """Control Chromecast Audio."""
+    def __init__(self, say, keyword, cast):
+        self.say = say
+        self.keyword = keyword
+        self.cast = cast
+
+    def run(self, voice_command):
+        command = voice_command.replace(self.keyword, "").strip()
+        logging.info("Chromecast command : %s", command)
+        result = False
+        for operation in CASTAUDIO_OPERATION_LIST:
+            if operation[0] == command:
+                operation[1](self.cast, self.say)
+                result = True
+
+        if result == True:
+            aiy.audio.play_wave(OK_VOICE_FILE)
+        else:
+            self.say(_(command  + "is invalid command"))
+
+
 def make_actor(say, actor):
     """Create an actor to carry out the user's commands."""
 
@@ -175,8 +212,23 @@ def make_actor(say, actor):
 #    actor.add_keyword(_('volume down'), VolumeControl(say, -10))
 #    actor.add_keyword(_('max volume'), VolumeControl(say, 100))
 
+    # Get Chromecast audio devive
+    cast = []
+    chromecasts = pychromecast.get_chromecasts()
+    print(chromecasts)
+    if chromecasts != []:
+        for cc in chromecasts:
+            if cc.device.friendly_name == CASTAUDIO_NAME:
+                cast = cc
+                cast.wait()
+                break
+
     actor.add_keyword(_('turn on'), PowerControl(say, 'turn on the', 1))
     actor.add_keyword(_('turn off'), PowerControl(say, 'turn off the', 0))
     actor.add_keyword(_('turn up'), PowerControl(say, 'turn up the', 0))
 
     actor.add_keyword(_('on TV'), TVControl(say, "on TV"))
+
+    actor.add_keyword(_('my music'), CastAudioControl(say, "my music", cast))
+    actor.add_keyword(_('the music'), CastAudioControl(say, "the music", cast))
+    actor.add_keyword(_('this song'), CastAudioControl(say, "this song", cast))

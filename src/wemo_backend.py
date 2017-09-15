@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from contextlib import contextmanager
 
 
-WEMO_SERVCE_IP = "192.168.0.2:"
+WEMO_SERVCE_IP = "192.168.2.12:"
 
 wemos = [
 (WEMO_SERVCE_IP + "52000", "TV"),
