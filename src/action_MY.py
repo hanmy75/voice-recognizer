@@ -29,6 +29,8 @@ OK_VOICE_FILE = "/home/pi/voice-recognizer/resource/okay.wav"
 # Chromecast Audio Frendly name
 CASTAUDIO_NAME = "MY Cast"
 
+POWER_GROUP_STRING = "living room"
+
 # Chromecast Audio
 def CastPlay_Operation(cast, say):
     logging.info("Cast Play")
@@ -56,7 +58,7 @@ def CastStop_Operation(cast, say):
     if cast != []:
         mc = cast.media_controller
         mc.block_until_active(timeout=1)
-        mc.stop()
+        mc.pause()
 
 def CastVolumeUp_Operation(cast, say):
     logging.info("Cast Volume Up")
@@ -93,7 +95,6 @@ CASTAUDIO_OPERATION_LIST = [
 # [2] : On/Off flag for TV control
 OPERATION_LIST = [
     ["TV", "TV", 0],
-    ["speaker", "Speaker", 0],
     ["table", "Table", 0],
     ["center", "Center", 0],
     ["window", "Window", 0],
@@ -104,6 +105,11 @@ OPERATION_LIST = [
     ["volume down", "Volume", 0],
 ]
 
+POWER_GROUP_LIST = [
+    ["table", "Table"],
+    ["center", "Center"],
+    ["window", "Window"],
+]
 
 # Example: Change the volume
 # ==========================
@@ -144,18 +150,25 @@ class PowerControl(object):
     def run(self, voice_command):
         command = voice_command.replace(self.keyword, "").strip()
         logging.info("Power %s on/off %d", command, self.flag)
+        aiy.audio.play_wave(OK_VOICE_FILE)
         result = False
-        for operation in OPERATION_LIST:
-            if operation[0] == command:
+        if command == POWER_GROUP_STRING:
+            for operation in POWER_GROUP_LIST:
                 if self.flag == 1:
                     wemo_backend.wemo_dict[operation[1]].on()
                 else:
                     wemo_backend.wemo_dict[operation[1]].off()
                 result = True
-
-        if result == True:
-            aiy.audio.play_wave(OK_VOICE_FILE)
         else:
+            for operation in OPERATION_LIST:
+                if operation[0] == command:
+                    if self.flag == 1:
+                        wemo_backend.wemo_dict[operation[1]].on()
+                    else:
+                        wemo_backend.wemo_dict[operation[1]].off()
+                    result = True
+
+        if result != True:
             self.say(_("I couldn't find " + command))
 
 
@@ -168,6 +181,7 @@ class TVControl(object):
     def run(self, voice_command):
         command = voice_command.replace(self.keyword, "").strip()
         logging.info("TV command : %s", command)
+        aiy.audio.play_wave(OK_VOICE_FILE)
         result = False
         for operation in OPERATION_LIST:
             if operation[0] == command:
@@ -177,9 +191,7 @@ class TVControl(object):
                     wemo_backend.wemo_dict[operation[1]].off()
                 result = True
 
-        if result == True:
-            aiy.audio.play_wave(OK_VOICE_FILE)
-        else:
+        if result != True:
             self.say(_("I couldn't find " + command))
 
 
@@ -193,15 +205,14 @@ class CastAudioControl(object):
     def run(self, voice_command):
         command = voice_command.replace(self.keyword, "").strip()
         logging.info("Chromecast command : %s", command)
+        aiy.audio.play_wave(OK_VOICE_FILE)
         result = False
         for operation in CASTAUDIO_OPERATION_LIST:
             if operation[0] == command:
                 operation[1](self.cast, self.say)
                 result = True
 
-        if result == True:
-            aiy.audio.play_wave(OK_VOICE_FILE)
-        else:
+        if result != True:
             self.say(_(command  + "is invalid command"))
 
 
